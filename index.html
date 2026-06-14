@@ -10,290 +10,127 @@
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg: #0a0a0a;
-      --accent: #6366f1;
-      --accent-hover: #4f52d6;
-      --surface: #141414;
-      --border: rgba(255,255,255,0.08);
-      --text: #f1f1f1;
-      --text-muted: #888;
+      --bg: #0a0a0a; --accent: #6366f1; --accent-hover: #4f52d6;
+      --surface: #141414; --border: rgba(255,255,255,0.08);
+      --text: #f1f1f1; --text-muted: #888;
     }
-
-    html, body {
-      height: 100%;
-      width: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      overflow: hidden;
-    }
-
-    #app {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    #topbar {
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 20px;
-      background: linear-gradient(to bottom, rgba(10,10,10,0.9) 0%, transparent 100%);
-      pointer-events: none;
-    }
-
-    #topbar h1 {
-      font-size: 14px;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      color: var(--text);
-      opacity: 0.7;
-    }
-
-    #upload-wrap {
-      pointer-events: all;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    #upload-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 9px 18px;
-      background: var(--accent);
-      color: #fff;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.15s, box-shadow 0.15s;
-      box-shadow: 0 4px 20px rgba(99,102,241,0.35);
-      user-select: none;
-    }
-
+    html, body { height: 100%; width: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow: hidden; }
+    #app { position: relative; width: 100vw; height: 100vh; display: flex; flex-direction: column; }
+    #safari-notice { display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(239,68,68,0.15); border-bottom: 1px solid rgba(239,68,68,0.3); padding: 10px 16px 10px 16px; font-size: 12px; color: #f87171; line-height: 1.5; }
+    #safari-notice.visible { display: block; }
+    #safari-notice strong { color: #fca5a5; }
+    #topbar { position: absolute; top: 0; left: 0; right: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: linear-gradient(to bottom, rgba(10,10,10,0.9) 0%, transparent 100%); pointer-events: none; }
+    #topbar h1 { font-size: 14px; font-weight: 600; letter-spacing: 0.04em; color: var(--text); opacity: 0.7; }
+    #upload-wrap { pointer-events: all; display: flex; align-items: center; gap: 10px; }
+    #upload-label { display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px; background: var(--accent); color: #fff; border-radius: 10px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s, box-shadow 0.15s; box-shadow: 0 4px 20px rgba(99,102,241,0.35); user-select: none; }
     #upload-label:hover { background: var(--accent-hover); }
     #upload-label svg { flex-shrink: 0; }
     #file-input { display: none; }
-
-    #file-name {
-      font-size: 12px;
-      color: var(--text-muted);
-      max-width: 160px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    model-viewer {
-      width: 100%;
-      height: 100%;
-      background-color: var(--bg);
-      --poster-color: var(--bg);
-    }
-
-    #empty-state {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      pointer-events: none;
-      transition: opacity 0.3s;
-    }
-
-    #empty-state.hidden { opacity: 0; }
-
-    #empty-icon {
-      width: 72px;
-      height: 72px;
-      border-radius: 20px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #empty-state p {
-      font-size: 14px;
-      color: var(--text-muted);
-      text-align: center;
-      line-height: 1.6;
-    }
-
+    #file-name { font-size: 12px; color: var(--text-muted); max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    model-viewer { width: 100%; height: 100%; background-color: var(--bg); --poster-color: var(--bg); }
+    #empty-state { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; pointer-events: none; transition: opacity 0.3s; }
+    #empty-state.hidden { opacity: 0; pointer-events: none; }
+    #empty-icon { width: 72px; height: 72px; border-radius: 20px; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; }
+    #empty-state p { font-size: 14px; color: var(--text-muted); text-align: center; line-height: 1.6; padding: 0 24px; }
     #empty-state strong { color: var(--text); font-weight: 500; }
-
-    model-viewer::part(default-ar-button) {
-      bottom: 24px;
-      right: 24px;
-      background: var(--accent);
-      border-radius: 50px;
-      padding: 12px 22px;
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      color: white;
-      box-shadow: 0 4px 24px rgba(99,102,241,0.45);
-      border: none;
-    }
-
-    #bottombar {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      padding: 16px 20px 20px;
-      background: linear-gradient(to top, rgba(10,10,10,0.85) 0%, transparent 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none;
-      z-index: 10;
-    }
-
-    #ar-hint {
-      display: none;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      color: var(--text-muted);
-      background: rgba(20,20,20,0.8);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 8px 16px;
-      backdrop-filter: blur(8px);
-    }
-
+    #loading-state { display: none; position: absolute; inset: 0; align-items: center; justify-content: center; flex-direction: column; gap: 16px; pointer-events: none; }
+    #loading-state.visible { display: flex; }
+    .spinner { width: 36px; height: 36px; border: 3px solid rgba(99,102,241,0.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loading-state p { font-size: 13px; color: var(--text-muted); }
+    model-viewer::part(default-ar-button) { bottom: 80px; right: 24px; background: var(--accent); border-radius: 50px; padding: 12px 22px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: white; box-shadow: 0 4px 24px rgba(99,102,241,0.45); border: none; }
+    #bottombar { position: absolute; bottom: 0; left: 0; right: 0; padding: 16px 20px 32px; background: linear-gradient(to top, rgba(10,10,10,0.85) 0%, transparent 100%); display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 10; }
+    #ar-hint { display: none; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); background: rgba(20,20,20,0.8); border: 1px solid var(--border); border-radius: 999px; padding: 8px 16px; backdrop-filter: blur(8px); }
     #ar-hint.visible { display: flex; }
-
-    #ar-dot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: var(--accent);
-      animation: pulse 1.8s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.75); }
-    }
+    #ar-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: pulse 1.8s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.75); } }
   </style>
 </head>
 <body>
 <div id="app">
+  <div id="safari-notice"><strong>Open in Safari for AR.</strong> Chrome on iPhone doesn't support AR Quick Look — tap ··· → Open in Safari.</div>
   <div id="topbar">
     <h1>AR VIEWER</h1>
     <div id="upload-wrap">
       <span id="file-name"></span>
       <label id="upload-label" for="file-input">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="17 8 12 3 7 8"/>
-          <line x1="12" y1="3" x2="12" y2="15"/>
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
         </svg>
         Load Model
       </label>
       <input type="file" id="file-input" accept=".glb,.usdz,model/gltf-binary,model/vnd.usdz+zip" />
     </div>
   </div>
-
-  <model-viewer
-    id="viewer"
-    camera-controls
-    shadow-intensity="1"
-    ar
-    ar-modes="webxr scene-viewer quick-look"
-    ar-scale="auto"
-    auto-rotate
-    rotation-per-second="20deg"
-    environment-image="neutral"
-    exposure="1"
-    style="width:100%;height:100%;"
-  ></model-viewer>
-
+  <model-viewer id="viewer" camera-controls shadow-intensity="1.2" ar ar-modes="webxr scene-viewer quick-look" ar-scale="auto" auto-rotate rotation-per-second="20deg" environment-image="neutral" exposure="1.5" tone-mapping="neutral" style="width:100%;height:100%;"></model-viewer>
+  <div id="loading-state"><div class="spinner"></div><p>Loading model…</p></div>
   <div id="empty-state">
     <div id="empty-icon">
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-        <path d="M2 17l10 5 10-5"/>
-        <path d="M2 12l10 5 10-5"/>
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
       </svg>
     </div>
     <p><strong>No model loaded</strong><br/>Tap <em>Load Model</em> to open a .glb or .usdz file</p>
   </div>
-
-  <div id="bottombar">
-    <div id="ar-hint">
-      <span id="ar-dot"></span>
-      Tap the AR button to place in your space
-    </div>
-  </div>
+  <div id="bottombar"><div id="ar-hint"><span id="ar-dot"></span>Tap the AR button to place in your space</div></div>
 </div>
-
 <script>
-  const fileInput = document.getElementById('file-input');
-  const viewer    = document.getElementById('viewer');
+  const fileInput  = document.getElementById('file-input');
+  const viewer     = document.getElementById('viewer');
   const emptyState = document.getElementById('empty-state');
-  const fileName  = document.getElementById('file-name');
-  const arHint    = document.getElementById('ar-hint');
-
+  const loadState  = document.getElementById('loading-state');
+  const fileName   = document.getElementById('file-name');
+  const arHint     = document.getElementById('ar-hint');
+  const isIOS      = /iPhone|iPad/i.test(navigator.userAgent);
+  const isChrome   = /CriOS/i.test(navigator.userAgent);
+  if (isIOS && isChrome) {
+    document.getElementById('safari-notice').classList.add('visible');
+    document.getElementById('topbar').style.top = '42px';
+  }
   let currentObjectURL = null;
   let dragDepth = 0;
-
   fileInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
     loadFile(file);
     fileInput.value = '';
   });
-
   function loadFile(file) {
     if (currentObjectURL) URL.revokeObjectURL(currentObjectURL);
     currentObjectURL = URL.createObjectURL(file);
-
-    const isUSDZ = file.name.toLowerCase().endsWith('.usdz');
+    const isUSDZ   = file.name.toLowerCase().endsWith('.usdz');
     const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-
     viewer.removeAttribute('src');
     viewer.removeAttribute('ios-src');
-
     if (isUSDZ) {
       viewer.setAttribute('ios-src', currentObjectURL);
       if (!isMobile) {
         emptyState.classList.remove('hidden');
-        emptyState.querySelector('p').innerHTML =
-          '<strong>' + file.name + '</strong><br/>USDZ is iOS-only — open this page on iPhone or iPad to view in AR';
+        emptyState.querySelector('p').innerHTML = '<strong>' + file.name + '</strong><br/>USDZ is iOS-only — open this page on iPhone or iPad to view in AR';
         fileName.textContent = file.name;
         return;
       }
     } else {
+      emptyState.classList.add('hidden');
+      loadState.classList.add('visible');
       viewer.setAttribute('src', currentObjectURL);
     }
-
     fileName.textContent = file.name;
-    emptyState.classList.add('hidden');
-    emptyState.querySelector('p').innerHTML =
-      '<strong>No model loaded</strong><br/>Tap <em>Load Model</em> to open a .glb or .usdz file';
-
+    emptyState.querySelector('p').innerHTML = '<strong>No model loaded</strong><br/>Tap <em>Load Model</em> to open a .glb or .usdz file';
     if (isMobile) arHint.classList.add('visible');
   }
-
+  viewer.addEventListener('load', () => { loadState.classList.remove('visible'); emptyState.classList.add('hidden'); });
+  viewer.addEventListener('error', () => {
+    loadState.classList.remove('visible');
+    emptyState.classList.remove('hidden');
+    emptyState.querySelector('p').innerHTML = '<strong>Failed to load model</strong><br/>File may be corrupt or unsupported';
+  });
   document.addEventListener('dragenter', (e) => { dragDepth++; e.preventDefault(); });
   document.addEventListener('dragleave', () => { dragDepth--; });
   document.addEventListener('dragover',  (e) => e.preventDefault());
   document.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dragDepth = 0;
+    e.preventDefault(); dragDepth = 0;
     const file = e.dataTransfer.files[0];
     if (file && /\.(glb|usdz)$/i.test(file.name)) loadFile(file);
   });

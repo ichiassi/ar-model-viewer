@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: ar-model-viewer
+    env: static
+    staticPublishPath: .
+    buildCommand: ""
+    pullRequestPreviewsEnabled: true
